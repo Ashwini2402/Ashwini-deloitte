@@ -1,0 +1,73 @@
+import json
+import datetime
+
+def convertFromFormat1(jsonObject):
+    locationParts = jsonObject['location'].split('/')
+
+    result = {
+        'deviceID': jsonObject['deviceID'],
+        'deviceType': jsonObject['deviceType'],
+        'timestamp': jsonObject['timestamp'],
+        'location': {
+            'country': locationParts[0],
+            'city': locationParts[1],
+            'area': locationParts[2],
+            'factory': locationParts[3],
+            'section': locationParts[4]
+        },
+        'data': {
+            'status': jsonObject['operationStatus'],
+            'temperature': jsonObject['temp']
+        }
+    }
+
+    return result
+
+
+
+def convertFromFormat2(jsonObject):
+  
+    dt = datetime.datetime.strptime(
+        jsonObject['timestamp'], "%Y-%m-%dT%H:%M:%S.%fZ"
+    )
+    timestamp = round((dt - datetime.datetime(1970, 1, 1)).total_seconds() * 1000)
+
+    result = {
+        'deviceID': jsonObject['device']['id'],
+        'deviceType': jsonObject['device']['type'],
+        'timestamp': timestamp,
+        'location': {
+            'country': jsonObject['country'],
+            'city': jsonObject['city'],
+            'area': jsonObject['area'],
+            'factory': jsonObject['factory'],
+            'section': jsonObject['section']
+        },
+        'data': {
+            'status': jsonObject['data']['status'],
+            'temperature': jsonObject['data']['temperature']
+        }
+    }
+
+    return result
+
+
+def main(jsonObject):
+    if 'device' in jsonObject:
+        return convertFromFormat2(jsonObject)
+    else:
+        return convertFromFormat1(jsonObject)
+
+
+if __name__ == "__main__":
+    with open("data-1.json") as f1:
+        data1 = json.load(f1)
+
+    with open("data-2.json") as f2:
+        data2 = json.load(f2)
+
+    print("Format 1 Output:")
+    print(json.dumps(main(data1), indent=2))
+
+    print("\nFormat 2 Output:")
+    print(json.dumps(main(data2), indent=2))

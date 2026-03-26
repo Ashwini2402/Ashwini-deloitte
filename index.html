@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>JSON Converter</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #111;
+      color: #fff;
+      padding: 20px;
+    }
+    textarea {
+      width: 100%;
+      height: 150px;
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 10px;
+      background: #00c896;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+    pre {
+      background: #222;
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>JSON Format Converter</h2>
+
+<textarea id="inputJson" placeholder="Paste JSON here..."></textarea>
+<br>
+<button onclick="convert()">Convert</button>
+
+<h3>Output:</h3>
+<pre id="output"></pre>
+
+<script>
+function convert() {
+    let input = JSON.parse(document.getElementById("inputJson").value);
+    let result;
+
+    if (input.device) {
+        // Format 2
+        let timestamp = new Date(input.timestamp).getTime();
+
+        result = {
+            deviceID: input.device.id,
+            deviceType: input.device.type,
+            timestamp: timestamp,
+            location: {
+                country: input.country,
+                city: input.city,
+                area: input.area,
+                factory: input.factory,
+                section: input.section
+            },
+            data: input.data
+        };
+    } else {
+        // Format 1
+        let parts = input.location.split("/");
+
+        result = {
+            deviceID: input.deviceID,
+            deviceType: input.deviceType,
+            timestamp: input.timestamp,
+            location: {
+                country: parts[0],
+                city: parts[1],
+                area: parts[2],
+                factory: parts[3],
+                section: parts[4]
+            },
+            data: {
+                status: input.operationStatus,
+                temperature: input.temp
+            }
+        };
+    }
+
+    document.getElementById("output").textContent =
+        JSON.stringify(result, null, 2);
+}
+</script>
+
+</body>
+</html>
